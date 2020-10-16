@@ -453,6 +453,15 @@ class base {
             throw new \moodle_exception('errorauthinvalididtoken', 'auth_oidc');
         }
 
+        // DYNAMIC - patch found at https://github.com/microsoft/o365-moodle/issues/1342.
+        // "The existing token for this user does not contain a valid user ID" error.
+        if ($userid == 0) {
+            $userrec = $DB->get_record('user', array('username' => $username));
+            if ($userrec) {
+                $userid = $userrec->id;
+            }
+        }
+
         $tokenrec = new \stdClass;
         $tokenrec->oidcuniqid = $oidcuniqid;
         $tokenrec->username = $username;
